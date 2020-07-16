@@ -2,17 +2,17 @@
 """
 Created on Tue Jul 14 21:19:20 2020
 
-@author: HP
+@author: Vukašin Vasiljević
 """
 
 from selenium import webdriver
 from bs4 import BeautifulSoup as bs
 import pandas as pd
-import sys
+
+
 driver = webdriver.Chrome('C:/Users/HP/Downloads/chromedriver.exe')
 
-
-
+# Function that parser through page and returns bs content
 def parse_page(url):
     try:
         driver.get(url)
@@ -22,7 +22,7 @@ def parse_page(url):
     except:
         pass
 
-# returns a list of all models of one brand
+# Returns a list of all models of one brand
 def get_models(brand):
 	brand = (brand.replace(' ', '-')).lower()
 	url ='https://www.polovniautomobili.com/auto-oglasi/pretraga?brand=' + brand
@@ -37,7 +37,7 @@ def get_models(brand):
 	return models_list[1:]
 
 
-# returns a list of all brands 
+# Returns a list of all brands 
 def all_Brands():
 	url = 'https://www.polovniautomobili.com/#'
 	soup = parse_page(url)
@@ -60,6 +60,7 @@ def replace(string):
 	string = string.replace('Č','c')
 	return string
 
+# Function that returns number of pages for each model of car 
 def get_num_of_cars(url):
 	soup = parse_page(url)
 	if soup!=None:
@@ -74,7 +75,7 @@ def get_num_of_cars(url):
 
 
 
-# get all cars from one brand and model
+# Get all cars from one brand (iterate through each model in given brand)
 def get_cars(brand, model):
 
 	brand = (brand.replace(' ', '-')).lower()
@@ -82,10 +83,11 @@ def get_cars(brand, model):
 	url ='https://www.polovniautomobili.com/auto-oglasi/pretraga?brand=' + brand + '&model[]=' + model
 
 
-	
+	# find number of pages in a given model
 	num = get_num_of_cars(url)
 	if num==0:
 		num=1
+    # if ther are car ads on site and number of cars is greater or equal to 100
 	if num!=-1 and num>=4:
 		carList = []
 		# loop over number of pages
@@ -101,16 +103,18 @@ def get_cars(brand, model):
 						if title==None:
 							pass
 						else:
-	                        
+                        	# first find ads with discount                       
 							discount = page.find(class_='price price-discount')
 							if discount!=None:
 								price = discount.get_text()
 								continue
 							else:
+                                # then look for ads without discount price
 								price = page.find(class_='price')
 								price = price.get_text()
 							content = page.findAll(class_='inline-block')
 							blocks = []
+                            # Find elements in ad and put them in variables
 							for con in content:
 								blocks.append(con.get_text())
 							god = int(blocks[0][:4])
@@ -123,8 +127,7 @@ def get_cars(brand, model):
 							kar = (blocks[4].replace(',',''))
 							kar = replace(kar)
 							sn = (blocks[5].replace(', ',''))
-							
-
+    						# Put everything in a dictionary
 							try:
 								price = int(price[:-2].replace('.',''))
 								dictionary = {
@@ -150,13 +153,12 @@ def get_cars(brand, model):
 	 
 		return carList
 	else:
-		
 		pass
 
-# function that inserts cars into database
+# function that inserts cars into dataframe and then loads into .csv file
 def insertAll(data):
-    
-    brands = ['volvo','zastava'] #all_Brands()
+    # iterate through every brand and every model of that brand and load data into dataframe
+    brands = all_Brands()
     try:
         for brand in brands:
             models = get_models(brand)
@@ -166,17 +168,20 @@ def insertAll(data):
                 else:
                     cars = get_cars(brand, model)
                     if cars!=None:
-	                    
                         data = data.append(cars,ignore_index=True)
                         data.to_csv(r'C:\Users\HP\Documents\Diplomski/carsPolovni.csv', mode='a',index = False)
 	                            
                     else:
                     	pass       
-                            
+        return True
     except Exception as e:
         pass
+    
 
-# create database and then insert data
-data = pd.DataFrame()
-insertAll(data)
-print("Data collected")
+if __name__=="__main__":
+    # create dataframe
+    data = pd.DataFrame()
+    if(insertAll(data)):
+        print("Data collected")
+    else:
+        print('Something went wrong!')
