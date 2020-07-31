@@ -9,28 +9,32 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import regex as re
 # Collecting data
-data = pd.read_csv('cars.csv')
+data = pd.read_csv('carsPolovni.csv')
 
 
-print('Mean for car price is: {}'.format(data.cena.mean()))
-print('Median for car price is: {}'.format(data.cena.median()))
-
-brands = data.brend.unique()
-
-
-print(data.brend.value_counts())
-brend_counts = data.brend.value_counts()
-to_remove = brend_counts[brend_counts<100].index
-print(to_remove)
-
-data = data[~data.brend.isin(to_remove)]
+print('Mean for car price is: {}'.format(data.Cena.mean()))
+print('Median for car price is: {}'.format(data.Cena.median()))
+print(data.Cena.min())
+data[data['Brend']=='']
+brands = data.Brend.unique()
+def contains(string):
+    regexp = re.compile(r'B5.5')
+    if regexp.search(string):
+        return True
+    
 
 
-print(data.brend.value_counts())
+contains('Volkswagen Passat B5.5 1.8T')
+print(data.Brend.value_counts())
+#brend_counts = data.brend.value_counts()
+#to_remove = brend_counts[brend_counts<100].index
+#print(to_remove)
 
-models = data.model.unique()
+
+
+
 
 """
 x = data.cena
