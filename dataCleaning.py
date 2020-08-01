@@ -14,27 +14,27 @@ import regex as re
 data = pd.read_csv('carsPolovni.csv')
 
 
-print('Mean for car price is: {}'.format(data.Cena.mean()))
-print('Median for car price is: {}'.format(data.Cena.median()))
-print(data.Cena.min())
-data[data['Brend']=='']
-brands = data.Brend.unique()
+#print('Mean for car price is: {}'.format(data.Cena.mean()))
+#print('Median for car price is: {}'.format(data.Cena.median()))
+#print(data.Cena.min())
+data[data['Brend']=='VOLKSWAGEN']['Model'].value_counts()
+
 def contains(string):
     regexp = re.compile(r'B5.5')
-    if regexp.search(string):
+    if not regexp.search(string):
         return True
     
-
-
-contains('Volkswagen Passat B5.5 1.8T')
 print(data.Brend.value_counts())
 #brend_counts = data.brend.value_counts()
 #to_remove = brend_counts[brend_counts<100].index
 #print(to_remove)
 
 
+indexes = data.groupby('Model').filter(lambda x : (x['Model'].count()<100).any()).index
 
+data.drop(indexes, inplace=True)
 
+data.to_csv('carsPolovni.csv', index=False)
 
 """
 x = data.cena
