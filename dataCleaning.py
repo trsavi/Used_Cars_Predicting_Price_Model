@@ -6,19 +6,21 @@ Created on Mon Jul 13 18:19:36 2020
 """
 
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 
 # Getting data
 data = pd.read_csv('carsPolovni.csv')
 
+data.info()
 
 print('Mean for car price is: {}'.format(data.Cena.mean()))
 print('Median for car price is: {}'.format(data.Cena.median()))
-print('Minimun car price is: {}'.format(data.Cena.min()))
-print('Maximum car price is: {}'.format(data.Cena.max()))
+print('Minimun car price is: {}'.format(data.Cena.min())) # 1
+print('Maximum car price is: {}'.format(data.Cena.max())) # 
+print('Minimun car power is: {}'.format(data.Snaga.min())) # 1
+print('Maximum car power is: {}'.format(data.Snaga.max())) # 2175
+print('Maximum mileage is: {}'.format(data.Kilometraza.max())) # 3800008
+print('Average mileage is: {}'.format(data.Kilometraza.mean())) # 214737
 
 
 
@@ -29,22 +31,18 @@ print(data[data['Cena']>50000]['Naziv'].count()) # 419
 print(data[data['Godiste']<1990]['Naziv'].count()) # 689
 print(data[data['Kilometraza']>300000]['Naziv'].count())# 4403
 
+data.drop(data[(data['Cena']<600) | (data['Cena']>50000) | (data['Godiste']<=1990) | (data['Kilometraza']>300000)].index, inplace=True)
 
-data.drop(data[(data['Cena']<600) | (data['Cena']>50000) | (data['Godiste']<=1990)].index, inplace=True)
+# Converting power variable from type of object to integer
 
-# Visualizing average price for each brand
+data['Snaga'].head()
 
-plt.figure(figsize=(15,5))
-chart = sns.barplot(x='Brend',y='Cena',data=data, estimator=np.std)
-chart.set_xticklabels(chart.get_xticklabels(), rotation=60)
+data['Snaga'] = data['Snaga'].apply(lambda power: int(power.split("(")[1].replace('KS)','')))
 
-# Year distribution
-sns.distplot(data['Godiste'], bins=30)
+data[data['Snaga']<50]['Naziv'].count() # 129
+data[data['Snaga']>300]['Naziv'].count() # 129
 
-# Mileage distribution
-
-sns.distplot(data['Kilometraza'], bins=30)
-
+data.drop(data[(data['Snaga']<50) | (data['Snaga']>300)].index, inplace=True)
 
 # Dropping all models that has less than 100 cars in dataset
 indexes = data.groupby('Model').filter(lambda x : (x['Model'].count()<100).any()).index
