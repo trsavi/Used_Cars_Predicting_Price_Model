@@ -10,34 +10,42 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Getting data
-data = pd.read_csv('carsPolovni.csv')
+cars = pd.read_csv('used_carsCleaned.csv')
 
 
-# Visualizing power based on brand
+plt.figure(figsize=(5,10))
+chart = sns.countplot(y='Brend', data=cars)
+
+
+# Just exploratory data analysis
 
 plt.figure(figsize=(20,5))
-sns.boxplot(x='Brend', y='Snaga', data=data, palette='viridis')
+sns.boxplot(x='Brend', y='Snaga', data=cars, palette='viridis')
 plt.tight_layout()
 
+sns.pairplot(cars, hue='Godiste', palette='viridis')
 
-# Visualizing average price for each brand
-
-plt.figure(figsize=(15,5))
-chart = sns.barplot(x='Brend',y='Cena',data=data, estimator=np.std)
-chart.set_xticklabels(chart.get_xticklabels(), rotation=60)
-
-# Visualizing BMW brand based on model and power
-
-bmw = data[data['Brend']=="BMW"]
-plt.figure(figsize=(12,6))
-sns.boxplot(x='Model', y='Kilometraza', data=bmw, palette='viridis')
-plt.title('BMW')
-plt.xlabel('Model')
-plt.ylabel('Kilometraza')
+plt.figure(figsize=(10,5))
+sns.boxplot(x='Model', y='Kilometraza', data=cars[cars['Brend']=='AUDI'], palette='viridis')
 plt.tight_layout()
 
-# V
-plt.figure(figsize=(20,5))
-sns.boxplot(x='Brend', y='Kilometraza', data=data, palette='viridis')
+plt.figure(figsize=(10,5))
+sns.boxplot(x='Model', y='Kilometraza', data=cars[cars['Brend']=='BMW'], palette='viridis')
 plt.tight_layout()
+
+plt.figure(figsize=(10,5))
+sns.boxplot(x='Model', y='Kilometraza', data=cars[cars['Brend']=='OPEL'], palette='viridis')
+plt.tight_layout()
+
+plt.figure(figsize=(5,10))
+sns.scatterplot(x='Godiste', y='Cena', data = cars, hue='Kilometraza')
+
+plt.figure(figsize=(5,8))
+sns.scatterplot('Snaga', 'Kubikaza', data = cars, hue='Gorivo')
+
+plt.figure(figsize=(5,10))
+sns.scatterplot(x='Cena', y='Kilometraza', data = cars, hue='Gorivo')
+
+# Here we can see correlation between different type of parameters
+plt.figure(figsize=(5,5))
+sns.heatmap(cars.corr())
