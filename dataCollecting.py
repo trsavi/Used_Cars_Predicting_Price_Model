@@ -68,7 +68,7 @@ def get_num_of_cars(url):
 			num = soup.findAll('small')
 			num = num[3].get_text()
 			num = num.split(' ')[-1]
-			return (round(int(num)/25))
+			return (round(int(num)/25)+1)
 		except:
 			return -1
 			pass

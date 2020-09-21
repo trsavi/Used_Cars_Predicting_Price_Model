@@ -2,7 +2,7 @@
 """
 Created on Mon Jul 13 18:19:36 2020
 
-@author: Vukašin vailjević
+@author: Vukašin Vasiljević
 """
 
 import pandas as pd
